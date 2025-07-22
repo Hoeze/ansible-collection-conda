@@ -1,9 +1,6 @@
-# collection_template
-You can build a new repository for an Ansible Collection using this template by following [Creating a repository from a template](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/creating-a-repository-from-a-template). This README.md contains recommended headings for your collection README.md, with comments describing what each section should contain. Once you have created your collection repository, delete this paragraph and the title above it from your README.md.
 
-# Foo Collection for Ansible
-<!-- Add CI and code coverage badges here. Samples included below. -->
-[![CI](https://github.com/ansible-collections/REPONAMEHERE/workflows/CI/badge.svg?event=push)](https://github.com/ansible-collections/REPONAMEHERE/actions) [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/REPONAMEHERE)](https://codecov.io/gh/ansible-collections/REPONAMEHERE)
+# Conda role collection for Ansible
+[![CI](https://github.com/Hoeze/ansible-collection-conda/workflows/CI/badge.svg?event=push)](https://github.com/Hoeze/ansible-collection-conda/actions) [![Codecov](https://img.shields.io/codecov/c/github/Hoeze/ansible-collection-conda)](https://codecov.io/gh/Hoeze/ansible-collection-conda)
 
 <!-- Describe the collection and why a user would want to use it. What does the collection do? -->
 
@@ -11,12 +8,7 @@ You can build a new repository for an Ansible Collection using this template by 
 
 <!-- Put your collection's mission statement in here. Example follows. -->
 
-At the `your collection name`, our mission is to produce and maintain simple, flexible,
-and powerful open-source software tailored to `your collection purpose`.
-
-We welcome members from all skill levels to participate actively in our open, inclusive, and vibrant community.
-Whether you are an expert or just beginning your journey with Ansible and `your collection name`,
-you are encouraged to contribute, share insights, and collaborate with fellow enthusiasts!
+This collection provides Ansible modules and plugins for managing Conda environments, enabling users to automate the setup and maintenance of Conda-based environments.
 
 ## Code of Conduct
 
@@ -95,31 +87,31 @@ Every voice is important. If you have something on your mind, create an issue or
 
 ## Using this collection
 
-<!--Include some quick examples that cover the most common use cases for your collection content. It can include the following examples of installation and upgrade (change NAMESPACE.COLLECTION_NAME correspondingly):-->
+<!--Include some quick examples that cover the most common use cases for your collection content. It can include the following examples of installation and upgrade (change hoeze.conda correspondingly):-->
 
 ### Installing the Collection from Ansible Galaxy
 
 Before using this collection, you need to install it with the Ansible Galaxy command-line tool:
 ```bash
-ansible-galaxy collection install NAMESPACE.COLLECTION_NAME
+ansible-galaxy collection install hoeze.conda
 ```
 
 You can also include it in a `requirements.yml` file and install it with `ansible-galaxy collection install -r requirements.yml`, using the format:
 ```yaml
 ---
 collections:
-  - name: NAMESPACE.COLLECTION_NAME
+  - name: hoeze.conda
 ```
 
 Note that if you install the collection from Ansible Galaxy, it will not be upgraded automatically when you upgrade the `ansible` package. To upgrade the collection to the latest available version, run the following command:
 ```bash
-ansible-galaxy collection install NAMESPACE.COLLECTION_NAME --upgrade
+ansible-galaxy collection install hoeze.conda --upgrade
 ```
 
 You can also install a specific version of the collection, for example, if you need to downgrade when something is broken in the latest version (please report an issue in this repository). Use the following syntax to install version `0.1.0`:
 
 ```bash
-ansible-galaxy collection install NAMESPACE.COLLECTION_NAME:==0.1.0
+ansible-galaxy collection install hoeze.conda:==0.1.0
 ```
 
 See [using Ansible collections](https://docs.ansible.com/ansible/devel/user_guide/collections_using.html) for more details.
@@ -127,10 +119,6 @@ See [using Ansible collections](https://docs.ansible.com/ansible/devel/user_guid
 ## Release notes
 
 See the [changelog](https://github.com/ansible-collections/REPONAMEHERE/tree/main/CHANGELOG.rst).
-
-## Roadmap
-
-<!-- Optional. Include the roadmap for this collection, and the proposed release/versioning strategy so users can anticipate the upgrade/update cycle. -->
 
 ## More information
 
@@ -144,8 +132,6 @@ See the [changelog](https://github.com/ansible-collections/REPONAMEHERE/tree/mai
 - [Important announcements for maintainers](https://github.com/ansible-collections/news-for-maintainers)
 
 ## Licensing
-
-<!-- Include the appropriate license information here and a pointer to the full licensing details. If the collection contains modules migrated from the ansible/ansible repo, you must use the same license that existed in the ansible/ansible repo. See the GNU license example below. -->
 
 GNU General Public License v3.0 or later.
 
