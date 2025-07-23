@@ -8,4 +8,3 @@
         conda_exe: "conda"
     - name: Include conda_env tests
       include_tasks: tasks/test_conda_env.yml
-

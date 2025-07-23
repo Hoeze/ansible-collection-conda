@@ -18,7 +18,7 @@ tags:
   - mamba
   - package
 repository: https://github.com/hoeze/nsible-collection-conda
-#documentation: https://github.com/ansible-collection-migration/community.REPO_NAME/tree/main/docs
+# documentation: https://github.com/ansible-collection-migration/community.REPO_NAME/tree/main/docs
 homepage: https://github.com/hoeze/nsible-collection-conda
 issues: https://github.com/hoeze/nsible-collection-conda/issues
 build_ignore:

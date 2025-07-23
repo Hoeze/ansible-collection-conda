@@ -47,7 +47,7 @@
       conda_env:
         name: "{{ test_env_name }}"
         spec:
-          name: { { test_env_name } }
+          name: "{{ test_env_name }}"
           channels:
             - defaults
           dependencies:
@@ -84,4 +84,3 @@
             path: "{{ '/tmp/environment_updated.yml' }}"
             state: absent
           changed_when: false
-

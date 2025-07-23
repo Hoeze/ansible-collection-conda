@@ -1,3 +1,4 @@
+---
 micromamba_base_url: "https://github.com/mamba-org/micromamba-releases/releases/latest/download/micromamba-{{ platform }}"
 micromamba_sha256_base_url: "https://github.com/mamba-org/micromamba-releases/releases/latest/download/micromamba-{{ platform }}.sha256"
 

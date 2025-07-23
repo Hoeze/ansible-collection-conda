@@ -14,7 +14,7 @@
 - name: Fail if platform is unsupported
   ansible.builtin.fail:
     msg: >
-      "Unsupported platform: {{ ansible_system }} {{ ansible_machine }}. 
+      "Unsupported platform: {{ ansible_system }} {{ ansible_machine }}.
        Please update micromamba_platform_mapping."
   when: micromamba_platform == "unknown-platform"
 

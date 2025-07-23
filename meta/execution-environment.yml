@@ -26,4 +26,3 @@ additional_build_steps:
     - RUN curl -L "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh" -o miniforge.sh && bash miniforge.sh -b -p /opt/miniforge && rm miniforge.sh
     - ENV PATH="/opt/miniforge/condabin:${PATH}"
     - RUN conda config --prepend envs_dirs /opt/conda_env && mkdir -p /opt/conda_env
-
