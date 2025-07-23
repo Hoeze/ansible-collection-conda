@@ -1,7 +1,30 @@
 ---
+- name: Download Miniforge installer
+  get_url:
+    url: "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-{{ ansible_system }}-{{ ansible_architecture }}.sh"
+    dest: /tmp/miniforge.sh
+    mode: '0755'
+
+- name: Install Miniforge
+  shell: bash /tmp/miniforge.sh -b -p /opt/miniforge
+  args:
+    creates: /opt/miniforge/bin/conda
+
+- name: Remove Miniforge installer
+  file:
+    path: /tmp/miniforge.sh
+    state: absent
+
+- name: Create conda environment directory
+  file:
+    path: /opt/conda_env
+    state: directory
+    mode: '0755'
+  become: yes
+
 - name: Set conda_exe for conda tests
   set_fact:
-    conda_exe: "conda"
+    conda_exe: "/opt/miniforge/condabin/conda"
 
 - name: Include common conda_env tests
   include_role:
