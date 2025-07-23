@@ -1,0 +1,14 @@
+---
+- name: Include micromamba role to set up micromamba
+  include_role:
+    name: micromamba
+
+- name: Assert that micromamba role sets conda_exe
+  assert:
+    that:
+      - conda_exe is defined
+      - conda_exe == "micromamba"
+
+- name: Include common conda_env tests
+  include_tasks: ../../tasks/common_test.yml
+

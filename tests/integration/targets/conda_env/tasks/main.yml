@@ -1,0 +1,8 @@
+---
+- name: Set conda_exe for conda tests
+  set_fact:
+    conda_exe: "conda"
+
+- name: Include common conda_env tests
+  include_tasks: ../../tasks/common_test.yml
+
