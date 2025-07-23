@@ -7,8 +7,8 @@
   assert:
     that:
       - conda_exe is defined
-      - conda_exe == "micromamba"
+      - conda_exe == "/usr/local/bin/micromamba"
 
 - name: Include common conda_env tests
-  include_tasks: ../../tasks/common_test.yml
-
+  include_role:
+    name: conda_env_tests

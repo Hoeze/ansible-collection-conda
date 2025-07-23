@@ -18,7 +18,7 @@
     - name: 2. Create environment (check mode)
       conda_env:
         name: "{{ test_env_name }}"
-        spec: "{{ lookup('file', 'files/environment.yml') | from_yaml }}"
+        spec: "{{ lookup('file', 'environment.yml') | from_yaml }}"
       check_mode: yes
       register: result
       failed_when: not result.changed or result.failed or result.prefix != "/opt/conda_env/{{ test_env_name }}"
@@ -26,7 +26,7 @@
     - name: 3. Create environment (live mode)
       conda_env:
         name: "{{ test_env_name }}"
-        spec: "{{ lookup('file', 'files/environment.yml') | from_yaml }}"
+        spec: "{{ lookup('file', 'environment.yml') | from_yaml }}"
       register: result
       failed_when: not result.changed or result.failed or result.prefix != "/opt/conda_env/{{ test_env_name }}"
 
@@ -39,7 +39,7 @@
     - name: 5. Update environment (no changes)
       conda_env:
         name: "{{ test_env_name }}"
-        spec: "{{ lookup('file', 'files/environment.yml') | from_yaml }}"
+        spec: "{{ lookup('file', 'environment.yml') | from_yaml }}"
       register: result
       failed_when: result.changed or result.failed or result.prefix != "/opt/conda_env/{{ test_env_name }}"
 
@@ -62,7 +62,7 @@
     - name: 7. Test with prefix - Create environment
       conda_env:
         prefix: "{{ test_env_prefix }}"
-        spec: "{{ lookup('file', 'files/environment.yml') | from_yaml }}"
+        spec: "{{ lookup('file', 'environment.yml') | from_yaml }}"
       register: result
       failed_when: not result.changed or result.failed or result.prefix != "{{ test_env_prefix }}"
 
