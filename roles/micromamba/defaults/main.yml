@@ -1,0 +1,10 @@
+micromamba_version: latest
+micromamba_destination: '/usr/local/bin/micromamba'
+micromamba_root_prefix: '/opt/micromamba'
+
+micromamba_default_channels:
+  - "conda-forge"
+  - "bioconda"
+
+micromamba_envs_dirs:
+  - "/opt/conda_env"

@@ -1,0 +1,100 @@
+---
+- name: "Check if micromamba already exists"
+  ansible.builtin.stat:
+    path: "{{ micromamba_destination }}"
+    get_checksum: true
+    checksum_algorithm: "sha256"
+    follow: true
+  register: micromamba_dest_stat
+
+- name: Map platform to value
+  ansible.builtin.set_fact:
+    micromamba_platform: "{{ micromamba_platform_mapping[ansible_system][ansible_machine] | default('unknown-platform') }}"
+
+- name: Fail if platform is unsupported
+  ansible.builtin.fail:
+    msg: >
+      "Unsupported platform: {{ ansible_system }} {{ ansible_machine }}. 
+       Please update micromamba_platform_mapping."
+  when: micromamba_platform == "unknown-platform"
+
+- name: Construct the micromamba URL
+  ansible.builtin.set_fact:
+    micromamba_url: "{{ micromamba_base_url }}"
+  vars:
+    platform: "{{ micromamba_platform }}"
+
+- name: Construct the micromamba SHA256 URL
+  ansible.builtin.set_fact:
+    micromamba_sha256_url: "{{ micromamba_sha256_base_url }}"
+  vars:
+    platform: "{{ micromamba_platform }}"
+
+- name: Fetch SHA256 checksum
+  ansible.builtin.uri:
+    url: "{{ micromamba_sha256_url }}"
+    return_content: yes
+  register: sha256_checksum
+
+# install micromamba
+- name: Install micromamba
+  ansible.builtin.get_url:
+    url: "{{ micromamba_url }}"
+    dest: "{{ micromamba_destination }}"
+    checksum: sha256:{{ sha256_checksum.content }}
+    mode: '0755'
+  register: result
+  until: result is succeeded
+  retries: 3
+  delay: 10
+  when: not micromamba_dest_stat.stat.exists or micromamba_dest_stat.stat.checksum != sha256_checksum.content
+
+- name: Export micromamba_destination
+  ansible.builtin.set_fact:
+    conda_exe: "{{ micromamba_destination }}"
+  when: conda_exe is not defined
+
+- name: Setup micromamba root prefix
+  block:
+    - name: Create micromamba root prefix dir
+      ansible.builtin.file:
+        path: "{{ micromamba_root_prefix }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Setup micromamba root prefix
+      ansible.builtin.template:
+        src: micromamba.sh.j2
+        dest: /etc/profile.d/micromamba.sh
+        owner: root
+        group: root
+        mode: '0644'
+
+- name: Setup conda configuration
+  block:
+    - name: Create /etc/conda directory
+      ansible.builtin.file:
+        path: "/etc/conda"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Setup condarc
+      ansible.builtin.template:
+        src: condarc.j2
+        dest: /etc/conda/condarc
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Create env directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+      loop: "{{ micromamba_envs_dirs }}"

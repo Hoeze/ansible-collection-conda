@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+
+channels:
+{{ micromamba_default_channels | to_nice_yaml(indent=2, sort_keys=False) }}
+denylist_channels: #!final
+  - https://repo.anaconda.com/pkgs/main
+  - https://repo.anaconda.com/pkgs/r
+  - https://repo.anaconda.com/pkgs/msys2
+
+envs_dirs:
+{{ micromamba_envs_dirs | to_nice_yaml(indent=2, sort_keys=False) }}
