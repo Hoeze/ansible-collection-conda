@@ -1,0 +1,15 @@
+---
+- name: Test conda_env module with micromamba
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Include micromamba role
+      include_role:
+        name: micromamba
+    - name: Assert that micromamba role sets conda_exe
+      assert:
+        that:
+          - conda_exe is defined
+          - conda_exe == "micromamba"
+    - name: Include conda_env tests
+      include_tasks: tasks/test_conda_env.yml
