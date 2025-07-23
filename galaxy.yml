@@ -1,23 +1,26 @@
 ---
 # See https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html
 
-namespace: community
-name: FIXME
+namespace: hoeze
+name: conda
 version: 0.1.0
 readme: README.md
 authors:
-  - YOUR NAME (github.com/YOURGITHUB)
-description: null
+  - Florian R. Hölzlwimmer (github.com/hoeze)
+description: This collection provides Ansible modules and plugins for managing Conda environments, enabling users to automate the setup and maintenance of Conda-based environments.
 license_file: LICENSE
 tags:
 # tags so people can search for collections https://galaxy.ansible.com/search
 # tags are all lower-case, no spaces, no dashes.
-  - example1
-  - example2
-repository: https://github.com/ansible-collections/community.REPO_NAME
+  - conda
+  - anaconda
+  - environment
+  - mamba
+  - package
+repository: https://github.com/hoeze/nsible-collection-conda
 #documentation: https://github.com/ansible-collection-migration/community.REPO_NAME/tree/main/docs
-homepage: https://github.com/ansible-collections/community.REPO_NAME
-issues: https://github.com/ansible-collections/community.REPO_NAME/issues
+homepage: https://github.com/hoeze/nsible-collection-conda
+issues: https://github.com/hoeze/nsible-collection-conda/issues
 build_ignore:
 # https://docs.ansible.com/ansible/devel/dev_guide/developing_collections_distributing.html#ignoring-files-and-folders
   - .gitignore

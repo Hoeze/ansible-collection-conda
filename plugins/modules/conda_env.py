@@ -48,7 +48,7 @@ EXAMPLES = r"""
   conda_env:
     name: myenv
   register: conda_env_result
-    
+
 - name: Create or update a Conda environment from a YAML file
   conda_env:
     spec: "{{ lookup('file', 'environment.yml') | from_yaml }}"
