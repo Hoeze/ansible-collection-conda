@@ -15,6 +15,20 @@
     path: /tmp/miniforge.sh
     state: absent
 
+- name: Add Miniforge to PATH
+  lineinfile:
+    path: /etc/environment
+    line: 'PATH="/opt/miniforge/condabin:$PATH"'
+    regexp: '^PATH='
+    backup: yes
+  become: yes
+
+- name: Source environment and configure conda
+  shell: |
+    /opt/miniforge/condabin/conda config --prepend envs_dirs /opt/conda_env
+  args:
+    creates: /opt/conda_env
+
 - name: Create conda environment directory
   file:
     path: /opt/conda_env
