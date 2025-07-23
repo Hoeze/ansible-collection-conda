@@ -106,9 +106,10 @@ msg:
 """
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common import yaml
+
 import os
 import json
-import yaml
 import tempfile
 import subprocess
 
@@ -289,7 +290,7 @@ def main():
             # Save spec file to a temporary file
             temp_fd, temp_spec_file_path = tempfile.mkstemp(suffix=".yaml")
             with os.fdopen(temp_fd, "w") as fp:
-                yaml.dump(spec, fp)
+                yaml.yaml_dump(spec, fp)
             result["conda_env_spec_file"] = temp_spec_file_path
 
             # Create or update the conda environment
