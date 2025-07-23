@@ -14,7 +14,7 @@
         conda_exe: "{{ conda_exe }}"
         name: "{{ test_env_name }}"
       register: result
-      failed_when: result.failed or result.is_valid_env or result.prefix != "/opt/conda_env/{{ test_env_name }}"
+      failed_when: result.failed or result.is_valid_env or result.prefix != "/opt/conda_env/" + test_env_name
 
     - name: 2. Create environment (check mode)
       conda_env:
@@ -23,7 +23,7 @@
         spec: "{{ lookup('file', 'environment.yml') | from_yaml }}"
       check_mode: yes
       register: result
-      failed_when: not result.changed or result.failed or result.prefix != "/opt/conda_env/{{ test_env_name }}"
+      failed_when: not result.changed or result.failed or result.prefix != "/opt/conda_env/" + test_env_name
 
     - name: 3. Create environment (live mode)
       conda_env:
@@ -31,14 +31,14 @@
         name: "{{ test_env_name }}"
         spec: "{{ lookup('file', 'environment.yml') | from_yaml }}"
       register: result
-      failed_when: not result.changed or result.failed or result.prefix != "/opt/conda_env/{{ test_env_name }}"
+      failed_when: not result.changed or result.failed or result.prefix != "/opt/conda_env/" + test_env_name
 
     - name: 4. Check if environment exists now (it should)
       conda_env:
         conda_exe: "{{ conda_exe }}"
         name: "{{ test_env_name }}"
       register: result
-      failed_when: not result.is_valid_env or result.failed or result.prefix != "/opt/conda_env/{{ test_env_name }}"
+      failed_when: not result.is_valid_env or result.failed or result.prefix != "/opt/conda_env/" + test_env_name
 
     - name: 5. Update environment (no changes)
       conda_env:
@@ -46,7 +46,7 @@
         name: "{{ test_env_name }}"
         spec: "{{ lookup('file', 'environment.yml') | from_yaml }}"
       register: result
-      failed_when: result.changed or result.failed or result.prefix != "/opt/conda_env/{{ test_env_name }}"
+      failed_when: result.changed or result.failed or result.prefix != "/opt/conda_env/" + test_env_name
 
     - name: 6. Update environment (with changes)
       conda_env:
@@ -63,7 +63,7 @@
             - pip:
                 - numpy
       register: result
-      failed_when: not result.changed or result.failed or result.prefix != "/opt/conda_env/{{ test_env_name }}"
+      failed_when: not result.changed or result.failed or result.prefix != "/opt/conda_env/" + test_env_name
 
     - name: 7. Test with prefix - Create environment
       conda_env:
@@ -71,7 +71,7 @@
         prefix: "{{ test_env_prefix }}"
         spec: "{{ lookup('file', 'environment.yml') | from_yaml }}"
       register: result
-      failed_when: not result.changed or result.failed or result.prefix != "{{ test_env_prefix }}"
+      failed_when: not result.changed or result.failed or result.prefix != test_env_prefix
 
   always:
     - name: Cleanup - Remove created environments and files
