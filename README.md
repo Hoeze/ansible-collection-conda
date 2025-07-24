@@ -350,7 +350,7 @@ This collection includes a `micromamba` role that automatically installs and con
     - name: Create a data science environment using micromamba
       hoeze.conda.conda_env:
         name: datascience
-        mamba_exe: '/usr/local/bin/micromamba'
+        mamba_exe: "{{ mamba_exe }}" # Automatically set by the micromamba role
         spec:
           name: datascience
           channels:
