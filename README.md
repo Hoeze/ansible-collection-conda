@@ -1,4 +1,3 @@
-
 # Conda role collection for Ansible
 [![CI](https://github.com/Hoeze/ansible-collection-conda/workflows/CI/badge.svg?event=push)](https://github.com/Hoeze/ansible-collection-conda/actions) [![Codecov](https://img.shields.io/codecov/c/github/Hoeze/ansible-collection-conda)](https://codecov.io/gh/Hoeze/ansible-collection-conda)
 
@@ -78,6 +77,13 @@ Every voice is important. If you have something on your mind, create an issue or
 
 <!-- List any external resources the collection depends on, for example minimum versions of an OS, libraries, or utilities. Do not list other Ansible collections here. -->
 
+This collection requires either **mamba** or **micromamba** to be installed on the target systems:
+
+- **Mamba**: A faster drop-in replacement for conda. Install via conda-forge: `conda install mamba -n base -c conda-forge`
+- **Micromamba**: A lightweight, standalone conda package manager. Can be installed using the included `micromamba` role
+
+The collection includes a `micromamba` role that can automatically install and configure micromamba for you. See the [Micromamba Role Usage](#micromamba-role-usage) section below for details.
+
 ### Supported connections
 <!-- Optional. If your collection supports only specific connection types (such as HTTPAPI, netconf, or others), list them here. -->
 
@@ -116,9 +122,274 @@ ansible-galaxy collection install hoeze.conda:==0.1.0
 
 See [using Ansible collections](https://docs.ansible.com/ansible/devel/user_guide/collections_using.html) for more details.
 
+## Usage of the `conda_env` module
+
+This collection provides the `conda_env` module for managing Conda environments. Below are some common usage examples.
+
+### Basic Examples
+
+#### Check if an environment exists
+```yaml
+- name: Check if a Conda environment exists
+  hoeze.conda.conda_env:
+    name: myenv
+  register: env_result
+
+- name: Display environment status
+  debug:
+    msg: "Environment exists: {{ env_result.is_valid_env }}"
+```
+
+#### Create a new environment from a specification
+```yaml
+- name: Create environment from inline specification
+  hoeze.conda.conda_env:
+    name: myproject
+    spec:
+      name: myproject
+      channels:
+        - conda-forge
+        - defaults
+      dependencies:
+        - python=3.12
+        - numpy
+        - pandas
+        - pip
+        - pip:
+            - requests
+            - flask
+```
+
+#### Create environment from a YAML file
+```yaml
+- name: Create environment from environment.yml file
+  hoeze.conda.conda_env:
+    name: myproject
+    spec: "{{ lookup('file', 'environment.yml') | from_yaml }}"
+```
+
+#### Use a custom prefix instead of a name
+```yaml
+- name: Create environment in a specific location
+  hoeze.conda.conda_env:
+    prefix: /opt/myapp/env
+    spec:
+      channels:
+        - conda-forge
+      dependencies:
+        - python=3.11
+        - scikit-learn
+```
+
+### Advanced Examples
+
+#### Update an existing environment
+```yaml
+- name: Update environment with new packages
+  hoeze.conda.conda_env:
+    name: myproject
+    spec:
+      name: myproject
+      channels:
+        - conda-forge
+      dependencies:
+        - python=3.12
+        - numpy
+        - pandas
+        - matplotlib  # New package
+        - pip:
+            - requests
+            - plotly      # New pip package
+```
+
+#### Explicitly specify the mamba executable
+```yaml
+- name: Create environment using mamba
+  hoeze.conda.conda_env:
+    name: myproject
+    mamba_exe: mamba  # or micromamba
+    spec:
+      name: myproject
+      channels:
+        - conda-forge
+      dependencies:
+        - python=3.12
+        - tensorflow
+        - pytorch
+```
+
+#### Check mode (dry run)
+```yaml
+- name: Check what changes would be made
+  hoeze.conda.conda_env:
+    name: myproject
+    spec:
+      name: myproject
+      channels:
+        - conda-forge
+      dependencies:
+        - python=3.12
+        - numpy
+        - new-package  # This will show what would be installed
+  check_mode: yes
+  register: dry_run_result
+
+- name: Show planned changes
+  debug:
+    var: dry_run_result.actions
+```
+
+### Complete Playbook Example
+
+```yaml
+---
+- name: Manage Conda environments
+  hosts: localhost
+  tasks:
+    - name: Ensure conda environment exists with specific packages
+      hoeze.conda.conda_env:
+        name: data-science
+        mamba_exe: mamba
+        spec:
+          name: data-science
+          channels:
+            - conda-forge
+            - defaults
+          dependencies:
+            - python=3.11
+            - jupyter
+            - numpy
+            - pandas
+            - matplotlib
+            - scikit-learn
+            - pip
+            - pip:
+                - seaborn
+                - plotly
+      register: env_result
+
+    - name: Display result
+      debug:
+        msg: |
+          Environment {{ 'created' if env_result.changed else 'already exists' }}
+          Location: {{ env_result.prefix }}
+          Packages: {{ env_result.package_list | length }} installed
+```
+
+### Module Parameters
+
+The `conda_env` module supports the following parameters:
+
+- `name`: Name of the environment (mutually exclusive with `prefix`)
+- `prefix`: Full path to environment location (mutually exclusive with `name`)
+- `spec`: Dictionary containing the environment specification (YAML structure)
+- `mamba_exe`: Path to mamba/micromamba executable (default: "mamba")
+
+### Return Values
+
+The module returns information about the environment operation:
+
+- `changed`: Whether the environment was modified
+- `is_valid_env`: Whether the environment exists
+- `prefix`: Full path to the environment
+- `package_list`: List of packages in the environment
+- `actions`: Actions performed by conda/mamba (if any)
+- `cmd`: The actual command that was executed
+
+## Micromamba Role Usage
+
+This collection includes a `micromamba` role that automatically installs and configures micromamba on your target systems. This is especially useful when you don't have mamba or micromamba pre-installed.
+
+### Basic Micromamba Role Usage
+
+#### Install micromamba with default settings
+```yaml
+---
+- name: Install micromamba
+  hosts: all
+  become: true
+  roles:
+    - hoeze.conda.micromamba
+```
+
+#### Install micromamba with custom settings
+```yaml
+---
+- name: Install micromamba with custom configuration
+  hosts: all
+  become: true
+  roles:
+    - hoeze.conda.micromamba
+  vars:
+    micromamba_destination: '/usr/local/bin/micromamba'
+    micromamba_version: 'latest'
+    micromamba_root_prefix: '/opt/micromamba'
+    micromamba_default_channels:
+      - conda-forge
+      - bioconda
+    micromamba_envs_dirs:
+      - "/opt/conda_env"
+      - "/home/user/envs"
+```
+
+### Complete Example with Environment Creation
+
+```yaml
+---
+- name: Setup micromamba and create environments
+  hosts: all
+  become: true
+  tasks:
+    - name: Install and configure micromamba
+      include_role:
+        name: hoeze.conda.micromamba
+      vars:
+        micromamba_destination: '/usr/local/bin/micromamba'
+        micromamba_root_prefix: '/opt/micromamba'
+
+    - name: Create a data science environment using micromamba
+      hoeze.conda.conda_env:
+        name: datascience
+        mamba_exe: '/usr/local/bin/micromamba'
+        spec:
+          name: datascience
+          channels:
+            - conda-forge
+          dependencies:
+            - python=3.11
+            - jupyter
+            - pandas
+            - numpy
+            - matplotlib
+```
+
+### Micromamba Role Variables
+
+The micromamba role supports the following variables:
+
+- `micromamba_destination`: Installation path for micromamba binary (default: `/usr/local/bin/micromamba`)
+- `micromamba_version`: Version to install (default: `latest`)
+- `micromamba_root_prefix`: Root directory for micromamba (default: `/opt/micromamba`)
+- `micromamba_default_channels`: List of default conda channels (default: `[conda-forge, bioconda]`)
+- `micromamba_envs_dirs`: List of directories where environments will be created (default: `[/opt/conda_env]`)
+
+### Using as a Dependency
+
+You can use the micromamba role as a dependency in other roles:
+
+```yaml
+---
+# meta/main.yml in your custom role
+dependencies:
+  - role: hoeze.conda.micromamba
+    when: install_micromamba | default(false)
+```
+
+The role automatically exports the `mamba_exe` variable pointing to the micromamba installation, which can be used by the `conda_env` module.
+
 ## Release notes
 
-See the [changelog](https://github.com/ansible-collections/REPONAMEHERE/tree/main/CHANGELOG.rst).
+See the [changelog](https://github.com/Hoeze/ansible-collection-conda/tree/main/CHANGELOG.rst).
 
 ## More information
 
