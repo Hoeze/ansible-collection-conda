@@ -36,7 +36,7 @@ For more information about communication, see the [Ansible communication guide](
 
 The content of this collection is made by people like you, a community of individuals collaborating on making the world better through developing automation software.
 
-We are actively accepting new contributors and all types of contributions are very welcome.
+New contributors are actively accepted and all types of contributions are very welcome.
 
 Don't know how to start? Refer to the [Ansible community guide](https://docs.ansible.com/ansible/devel/community/index.html)!
 
@@ -73,6 +73,8 @@ Every voice is important. If you have something on your mind, create an issue or
 
 <!-- List the versions of Ansible the collection has been tested with. Must match what is in galaxy.yml. -->
 
+This collection has been tested with Ansible Core >= 2.16 and is expected to work with all currently supported versions of Ansible.
+
 ## External requirements
 
 <!-- List any external resources the collection depends on, for example minimum versions of an OS, libraries, or utilities. Do not list other Ansible collections here. -->
@@ -84,12 +86,28 @@ This collection requires either **mamba** or **micromamba** to be installed on t
 
 The collection includes a `micromamba` role that can automatically install and configure micromamba for you. See the [Micromamba Role Usage](#micromamba-role-usage) section below for details.
 
-### Supported connections
-<!-- Optional. If your collection supports only specific connection types (such as HTTPAPI, netconf, or others), list them here. -->
-
 ## Included content
 
 <!-- Galaxy now usually displays full module and plugin docs within the UI. If you don't use Galaxy for your collection, you may need to either describe your plugins etc here, or point to an external docsite to cover that information. -->
+
+This collection includes the following content:
+
+### Modules
+
+| Name | Description |
+| ---- | ----------- |
+| [hoeze.conda.conda_env](https://github.com/Hoeze/ansible-collection-conda/blob/main/plugins/modules/conda_env.py) | Manage Conda environments using YAML specifications |
+
+### Roles
+
+| Name | Description |
+| ---- | ----------- |
+| [hoeze.conda.micromamba](https://github.com/Hoeze/ansible-collection-conda/blob/main/roles/micromamba/) | Install and configure micromamba package manager |
+
+<!--Refer to the following sections for details on how to use this collection's content:-->
+
+- See [Module Usage](#usage-of-the-conda_env-module) for examples using the `conda_env` module
+- See [Micromamba Role Usage](#micromamba-role-usage) for examples using the `micromamba` role
 
 ## Using this collection
 
