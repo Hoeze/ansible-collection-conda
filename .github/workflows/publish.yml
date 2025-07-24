@@ -1,0 +1,19 @@
+---
+name: Deploy Collection
+
+# Trigger the workflow however you prefer
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build and Deploy Collection
+        uses: artis3n/ansible_galaxy_collection@f6110aef877db4caaa7e9a192975fb006dea61fe
+        with:
+          api_key: '${{ secrets.GALAXY_API_KEY }}'
