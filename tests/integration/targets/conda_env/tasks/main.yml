@@ -36,9 +36,9 @@
     mode: '0755'
   become: yes
 
-- name: Set conda_exe for conda tests
+- name: Set mamba_exe for conda tests
   set_fact:
-    conda_exe: "/opt/miniforge/condabin/conda"
+    mamba_exe: "/opt/miniforge/condabin/mamba"
 
 - name: Include common conda_env tests
   include_role:

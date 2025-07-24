@@ -33,12 +33,12 @@ options:
       - The name of the Conda environment to manage (mutually exclusive with C(prefix)).
     required: false
     type: str
-  conda_exe:
+  mamba_exe:
     description:
-      - The path to the conda executable to use.
+      - The path to the mamba or micromamba executable to use.
     required: false
     type: str
-    default: conda
+    default: mamba
 author:
   - Florian R. Hölzlwimmer (@hoeze)
 """
@@ -75,7 +75,7 @@ is_valid_env:
   description: Whether the environment existed before the operation.
   type: bool
   returned: always
-conda_env_spec_file:
+spec_file_path:
   description: Path to the temporary YAML file used for the environment specification.
   type: str
   returned: when spec is provided
@@ -115,8 +115,8 @@ import subprocess
 import traceback
 
 
-def check_conda_env(conda_exe, prefix, name):
-    cmd = [conda_exe, "list", "--json"]
+def check_conda_env(mamba_exe, prefix, name):
+    cmd = [mamba_exe, "list", "--json"]
     if prefix:
         cmd.extend(["--prefix", prefix])
     if name:
@@ -143,14 +143,14 @@ def check_conda_env(conda_exe, prefix, name):
         ) from e
 
 
-def conda_env_create_update(
-    conda_exe, conda_env_subcommand, prefix, name, spec_file_path, dry_run=False
+def mamba_env_create_update(
+        mamba_exe, mamba_env_subcommand, prefix, name, spec_file_path, dry_run=False
 ):
     # Update environment
     cmd = [
-        conda_exe,
+        mamba_exe,
         "env",
-        conda_env_subcommand,
+        mamba_env_subcommand,
         "-y",
         "--json",
         "--file",
@@ -189,9 +189,9 @@ def conda_env_create_update(
         ) from e
 
 
-def conda_create(conda_exe, prefix, name, dry_run=False):
+def mamba_create(mamba_exe, prefix, name, dry_run=False):
     # Update environment
-    cmd = [conda_exe, "create", "-y", "--json"]
+    cmd = [mamba_exe, "create", "-y", "--json"]
     if prefix:
         cmd.extend(["--prefix", prefix])
     if name:
@@ -225,66 +225,35 @@ def conda_create(conda_exe, prefix, name, dry_run=False):
         ) from e
 
 
-def conda_run_getprefix(conda_exe, prefix, name, dry_run=False):
-    # Update environment
-    cmd = [conda_exe, "run"]
-    if prefix:
-        cmd.extend(["--prefix", prefix])
-    if name:
-        cmd.extend(["--name", name])
-
-    # run the "env" command
-    cmd.append("env")
-
-    try:
-        proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
-
-        parsed_env = {}
-        if proc.stdout:
-            for line in proc.stdout.strip().splitlines():
-                if "=" in line:
-                    key, value = line.split("=", 1)
-                    parsed_env[key] = value
-
-        return {
-            "cmd": cmd,
-            "returncode": proc.returncode,
-            "failed": proc.returncode != 0,
-            "changed": False,
-            "prefix": parsed_env.get("CONDA_PREFIX"),
-            "env": parsed_env,
-        }
-    except Exception as e:
-        raise Exception(
-            f"Exception occurred while running: '{subprocess.list2cmdline(cmd)}'"
-        ) from e
-
-
 def main():
     module = AnsibleModule(
         argument_spec=dict(
             spec=dict(type="dict", required=False, default=None),
             prefix=dict(type="str", required=False, default=None),
             name=dict(type="str", required=False, default=None),
-            conda_exe=dict(type="str", required=False, default="conda"),
+            mamba_exe=dict(type="str", required=False, default="mamba"),
         ),
         supports_check_mode=True,
     )
     spec = module.params["spec"]
     prefix = module.params["prefix"]
     name = module.params["name"]
-    conda_exe = module.params["conda_exe"]
+    mamba_exe = module.params["mamba_exe"]
+
+    # Warn if mamba_exe does not end with 'mamba'
+    if not mamba_exe.endswith('mamba'):
+        module.warn(f"Unknown executable '{mamba_exe}'. Please ensure that your executable has a mamba-compatible CLI.")
 
     result = dict()
 
     try:
         # Check if prefix is a valid conda environment
-        env_check_result = check_conda_env(conda_exe, prefix, name)
+        env_check_result = check_conda_env(mamba_exe, prefix, name)
         result.update(env_check_result)
 
         if spec:
             # Install or update environment based on validity
-            conda_env_subcommand = (
+            mamba_env_subcommand = (
                 "update" if env_check_result["is_valid_env"] else "create"
             )
 
@@ -292,39 +261,25 @@ def main():
             temp_fd, temp_spec_file_path = tempfile.mkstemp(suffix=".yaml")
             with os.fdopen(temp_fd, "w") as fp:
                 yaml.yaml_dump(spec, fp)
-            result["conda_env_spec_file"] = temp_spec_file_path
+            result["spec_file_path"] = temp_spec_file_path
 
             # Create or update the conda environment
-            conda_env_create_update_result = conda_env_create_update(
-                conda_exe=conda_exe,
-                conda_env_subcommand=conda_env_subcommand,
+            mamba_env_create_update_result = mamba_env_create_update(
+                mamba_exe=mamba_exe,
+                mamba_env_subcommand=mamba_env_subcommand,
                 prefix=prefix,
                 name=name,
                 spec_file_path=temp_spec_file_path,
                 dry_run=module.check_mode,
             )
-            result.update(conda_env_create_update_result)
+            result.update(mamba_env_create_update_result)
         else:
             # If no spec is provided, just return the environment check result.
             # We also try to determine the environment's prefix.
             if prefix is None:
-                if result["is_valid_env"]:
-                    # If the env exists, get its prefix
-                    prefix_result = conda_run_getprefix(conda_exe, prefix, name)
-                    if prefix_result["failed"]:
-                        module.fail_json(
-                            {
-                                **result,
-                                "msg": f"Failed to get prefix for otherwise valid environment '{name}'! This is likely a bug in the 'conda_env' module.",
-                                "cmd": prefix_result["cmd"],
-                                "returncode": prefix_result["returncode"],
-                            }
-                        )
-                    result["prefix"] = prefix_result["prefix"]
-                else:
-                    # If the env does not exist, do a dry-run create to find out where it would be created.
-                    create_result = conda_create(conda_exe, prefix, name, dry_run=True)
-                    result["prefix"] = create_result["prefix"]
+                # Do a dry-run create to find out where it would be created.
+                create_result = mamba_create(mamba_exe, prefix, name, dry_run=True)
+                result["prefix"] = create_result["prefix"]
             else:
                 # If a prefix is provided, we assume it is a valid conda environment.
                 result["prefix"] = prefix

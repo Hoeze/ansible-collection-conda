@@ -51,8 +51,8 @@
 
 - name: Export micromamba_destination
   ansible.builtin.set_fact:
-    conda_exe: "{{ micromamba_destination }}"
-  when: conda_exe is not defined
+    mamba_exe: "{{ micromamba_destination }}"
+  when: mamba_exe is not defined
 
 - name: Setup micromamba root prefix
   block:

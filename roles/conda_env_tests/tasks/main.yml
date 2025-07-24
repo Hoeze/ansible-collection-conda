@@ -11,14 +11,14 @@
   block:
     - name: 1. Check if environment exists (it should not)
       conda_env:
-        conda_exe: "{{ conda_exe }}"
+        mamba_exe: "{{ mamba_exe }}"
         name: "{{ test_env_name }}"
       register: result
       failed_when: result.failed or result.is_valid_env or result.prefix != "/opt/conda_env/" + test_env_name
 
     - name: 2. Create environment (check mode)
       conda_env:
-        conda_exe: "{{ conda_exe }}"
+        mamba_exe: "{{ mamba_exe }}"
         name: "{{ test_env_name }}"
         spec: "{{ lookup('file', 'environment.yml') | from_yaml }}"
       check_mode: yes
@@ -27,7 +27,7 @@
 
     - name: 3. Create environment (live mode)
       conda_env:
-        conda_exe: "{{ conda_exe }}"
+        mamba_exe: "{{ mamba_exe }}"
         name: "{{ test_env_name }}"
         spec: "{{ lookup('file', 'environment.yml') | from_yaml }}"
       register: result
@@ -35,14 +35,14 @@
 
     - name: 4. Check if environment exists now (it should)
       conda_env:
-        conda_exe: "{{ conda_exe }}"
+        mamba_exe: "{{ mamba_exe }}"
         name: "{{ test_env_name }}"
       register: result
       failed_when: not result.is_valid_env or result.failed or result.prefix != "/opt/conda_env/" + test_env_name
 
     - name: 5. Update environment (no changes)
       conda_env:
-        conda_exe: "{{ conda_exe }}"
+        mamba_exe: "{{ mamba_exe }}"
         name: "{{ test_env_name }}"
         spec: "{{ lookup('file', 'environment.yml') | from_yaml }}"
       register: result
@@ -50,7 +50,7 @@
 
     - name: 6. Update environment (with changes)
       conda_env:
-        conda_exe: "{{ conda_exe }}"
+        mamba_exe: "{{ mamba_exe }}"
         name: "{{ test_env_name }}"
         spec:
           name: "{{ test_env_name }}"
@@ -67,7 +67,7 @@
 
     - name: 7. Test with prefix - Create environment
       conda_env:
-        conda_exe: "{{ conda_exe }}"
+        mamba_exe: "{{ mamba_exe }}"
         prefix: "{{ test_env_prefix }}"
         spec: "{{ lookup('file', 'environment.yml') | from_yaml }}"
       register: result
@@ -77,7 +77,7 @@
     - name: Cleanup - Remove created environments and files
       block:
         - name: Remove named environment
-          command: "rm /opt/conda_env/* -rf"
+          command: "rm /opt/conda_env/ -rf && mkdir /opt/conda_env/"
           changed_when: false
           failed_when: false
 

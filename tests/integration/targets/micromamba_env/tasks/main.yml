@@ -3,11 +3,11 @@
   include_role:
     name: micromamba
 
-- name: Assert that micromamba role sets conda_exe
+- name: Assert that micromamba role sets mamba_exe
   assert:
     that:
-      - conda_exe is defined
-      - conda_exe == "/usr/local/bin/micromamba"
+      - mamba_exe is defined
+      - mamba_exe == "/usr/local/bin/micromamba"
 
 - name: Include common conda_env tests
   include_role:
