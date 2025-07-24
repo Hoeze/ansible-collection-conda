@@ -112,6 +112,7 @@ import os
 import json
 import tempfile
 import subprocess
+import traceback
 
 
 def check_conda_env(conda_exe, prefix, name):
@@ -329,7 +330,7 @@ def main():
                 result["prefix"] = prefix
 
     except Exception as e:
-        module.fail_json(msg=str(e))
+        module.fail_json(msg=f"{str(e)}\n{traceback.format_exc()}")
 
     if result["failed"]:
         module.fail_json(**result)
