@@ -1,5 +1,5 @@
 # Conda role collection for Ansible
-[![CI](https://github.com/Hoeze/ansible-collection-conda/workflows/CI/badge.svg?event=push)](https://github.com/Hoeze/ansible-collection-conda/actions) [![Codecov](https://img.shields.io/codecov/c/github/Hoeze/ansible-collection-conda)](https://codecov.io/gh/Hoeze/ansible-collection-conda)
+[![CI](https://github.com/Hoeze/ansible-collection-conda/workflows/CI/badge.svg)](https://github.com/Hoeze/ansible-collection-conda/actions) [![Codecov](https://img.shields.io/codecov/c/github/Hoeze/ansible-collection-conda)](https://codecov.io/gh/Hoeze/ansible-collection-conda)
 
 <!-- Describe the collection and why a user would want to use it. What does the collection do? -->
 
