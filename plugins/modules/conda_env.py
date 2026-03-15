@@ -111,40 +111,44 @@ from ansible.module_utils.common import yaml
 import os
 import json
 import tempfile
-import subprocess
+import shlex
 import traceback
 
 
-def check_conda_env(mamba_exe, prefix, name):
+def check_conda_env(module, mamba_exe, prefix, name):
     cmd = [mamba_exe, "list", "--json"]
     if prefix:
         cmd.extend(["--prefix", prefix])
     if name:
         cmd.extend(["--name", name])
     try:
-        proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
+        returncode, stdout, _stderr = module.run_command(cmd, check_rc=False)
         env_package_list = []
-        if proc.returncode == 0:
-            env_package_list = json.loads(proc.stdout)
+        if returncode == 0:
+            env_package_list = json.loads(stdout)
             is_valid_env = len(env_package_list) > 0
         else:
             is_valid_env = False
         return {
             "cmd": cmd,
             "package_list": env_package_list,
-            "returncode": proc.returncode,
+            "returncode": returncode,
             "is_valid_env": is_valid_env,
             "changed": False,
             "failed": False,
         }
     except Exception as e:
-        raise Exception(
-            f"Exception occurred while running: '{subprocess.list2cmdline(cmd)}'"
-        ) from e
+        raise Exception(f"Exception occurred while running: '{shlex.join(cmd)}'") from e
 
 
 def mamba_env_create_update(
-        mamba_exe, mamba_env_subcommand, prefix, name, spec_file_path, dry_run=False
+        module,
+        mamba_exe,
+        mamba_env_subcommand,
+        prefix,
+        name,
+        spec_file_path,
+        dry_run=False,
 ):
     # Update environment
     cmd = [
@@ -164,11 +168,11 @@ def mamba_env_create_update(
         cmd.append("--dry-run")
 
     try:
-        proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
+        returncode, stdout, _stderr = module.run_command(cmd, check_rc=False)
         env_output = {}
-        if proc.stdout:
+        if stdout:
             try:
-                env_output = json.loads(proc.stdout)
+                env_output = json.loads(stdout)
             except Exception:
                 env_output = {}
         actions = env_output.get("actions", None)
@@ -179,17 +183,15 @@ def mamba_env_create_update(
             "cmd": cmd,
             "actions": actions,
             "prefix": prefix,
-            "returncode": proc.returncode,
+            "returncode": returncode,
             "changed": changed,
             "failed": not success,
         }
     except Exception as e:
-        raise Exception(
-            f"Exception occurred while running: '{subprocess.list2cmdline(cmd)}'"
-        ) from e
+        raise Exception(f"Exception occurred while running: '{shlex.join(cmd)}'") from e
 
 
-def mamba_create(mamba_exe, prefix, name, dry_run=False):
+def mamba_create(module, mamba_exe, prefix, name, dry_run=False):
     # Update environment
     cmd = [mamba_exe, "create", "-y", "--json"]
     if prefix:
@@ -200,11 +202,11 @@ def mamba_create(mamba_exe, prefix, name, dry_run=False):
         cmd.append("--dry-run")
 
     try:
-        proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
+        returncode, stdout, _stderr = module.run_command(cmd, check_rc=False)
         env_output = {}
-        if proc.stdout:
+        if stdout:
             try:
-                env_output = json.loads(proc.stdout)
+                env_output = json.loads(stdout)
             except Exception:
                 env_output = {}
         actions = env_output.get("actions", None)
@@ -215,14 +217,12 @@ def mamba_create(mamba_exe, prefix, name, dry_run=False):
             "cmd": cmd,
             "actions": actions,
             "prefix": prefix,
-            "returncode": proc.returncode,
+            "returncode": returncode,
             "changed": changed,
             "failed": not success,
         }
     except Exception as e:
-        raise Exception(
-            f"Exception occurred while running: '{subprocess.list2cmdline(cmd)}'"
-        ) from e
+        raise Exception(f"Exception occurred while running: '{shlex.join(cmd)}'") from e
 
 
 def main():
@@ -248,7 +248,7 @@ def main():
 
     try:
         # Check if prefix is a valid conda environment
-        env_check_result = check_conda_env(mamba_exe, prefix, name)
+        env_check_result = check_conda_env(module, mamba_exe, prefix, name)
         result.update(env_check_result)
 
         if spec:
@@ -265,6 +265,7 @@ def main():
 
             # Create or update the conda environment
             mamba_env_create_update_result = mamba_env_create_update(
+                module=module,
                 mamba_exe=mamba_exe,
                 mamba_env_subcommand=mamba_env_subcommand,
                 prefix=prefix,
@@ -278,7 +279,9 @@ def main():
             # We also try to determine the environment's prefix.
             if prefix is None:
                 # Do a dry-run create to find out where it would be created.
-                create_result = mamba_create(mamba_exe, prefix, name, dry_run=True)
+                create_result = mamba_create(
+                    module, mamba_exe, prefix, name, dry_run=True
+                )
                 result["prefix"] = create_result["prefix"]
             else:
                 # If a prefix is provided, we assume it is a valid conda environment.

@@ -3,7 +3,7 @@
 
 namespace: hoeze
 name: conda
-version: 1.0.3
+version: 1.0.4
 readme: README.md
 authors:
   - Florian R. Hölzlwimmer (github.com/hoeze)
