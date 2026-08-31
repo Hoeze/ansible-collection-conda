@@ -1,2 +1,4 @@
 ---
-requires_ansible: '>=2.12'
+# Keep in sync with the ansible-core branches tested in
+# .github/workflows/ansible-test.yml. ansible-core 2.18 and older are EOL.
+requires_ansible: '>=2.19'
