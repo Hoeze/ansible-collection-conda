@@ -1,19 +1,32 @@
 ---
 name: Deploy Collection
 
-# Trigger the workflow however you prefer
 on:
-  release:
-    types:
-      - published
+  workflow_call:
+    inputs:
+      ref:
+        description: Git ref (release tag) to build and publish.
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git ref (release tag) to build and publish.
+        required: true
+        type: string
 
 jobs:
   deploy:
+    name: Build and publish to Ansible Galaxy
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
 
       - name: Build and Deploy Collection
-        uses: artis3n/ansible_galaxy_collection@f6110aef877db4caaa7e9a192975fb006dea61fe
+        uses: artis3n/ansible_galaxy_collection@ffbca2460a5a1c600b941bbf1536bd61de1c2227 # v3.0.0
         with:
           api_key: '${{ secrets.GALAXY_API_KEY }}'
