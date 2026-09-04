@@ -3,7 +3,9 @@ modules:
   # Configuration for modules/module_utils.
   # These settings do not apply to other content in the collection.
 
-  python_requires: '>=3.7'
+  python_requires: '>=3.8'
+  # Lowest target Python across the ansible-core branches tested in CI
+  # (stable-2.19 supports 3.8; stable-2.20+ start at 3.9).
   # Python versions supported by modules/module_utils.
   # This setting is required.
   #
