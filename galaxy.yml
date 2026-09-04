@@ -1,28 +1,24 @@
----
-# See https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html
-
 namespace: hoeze
 name: conda
-version: 1.0.4 # x-release-please-version
+version: 2.0.0
 readme: README.md
 authors:
   - Florian R. Hölzlwimmer (github.com/hoeze)
-description: This collection provides Ansible modules and plugins for managing Conda environments, enabling users to automate the setup and maintenance of Conda-based environments.
+description: >-
+  This collection provides Ansible modules and plugins for managing Conda
+  environments, enabling users to automate the setup and maintenance of
+  Conda-based environments.
 license_file: LICENSE
 tags:
-# tags so people can search for collections https://galaxy.ansible.com/search
-# tags are all lower-case, no spaces, no dashes.
   - conda
   - anaconda
   - environment
   - mamba
   - package
 repository: https://github.com/hoeze/ansible-collection-conda
-# documentation: https://github.com/ansible-collection-migration/community.REPO_NAME/tree/main/docs
 homepage: https://github.com/hoeze/ansible-collection-conda
 issues: https://github.com/hoeze/ansible-collection-conda/issues
 build_ignore:
-# https://docs.ansible.com/ansible/devel/dev_guide/developing_collections_distributing.html#ignoring-files-and-folders
   - .github
   - .gitignore
   - .release-please-manifest.json
